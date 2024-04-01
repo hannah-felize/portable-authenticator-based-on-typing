@@ -1,6 +1,6 @@
 import sqlite3
 import time
-import msvcrt
+import curses
 
 # Connect to the database
 conn = sqlite3.connect('typing_test.db')
@@ -18,8 +18,13 @@ cursor.execute('''
 ''')
 
 def conduct_typing_test(user):
-    print("Welcome to the typing test!")
-    print("Type the given text and press Enter when you're done.")
+    stdscr = curses.initscr()
+    curses.noecho()  # Disable automatic echoing of key presses
+    stdscr.clear()
+
+    stdscr.addstr("Welcome to the typing test!\n")
+    stdscr.addstr("Type the given text and press Enter when you're done.\n")
+    stdscr.refresh()
 
     text = "This is a sample typing test."  # Replace with your own text
 
@@ -29,16 +34,16 @@ def conduct_typing_test(user):
     typing_data = []  # Array to store typing test data
 
     while True:
-        key = msvcrt.getche()
+        key = stdscr.getch()
 
-        if key == b'\r':  # Enter key
+        if key == ord('\n'):  # Enter key
             break
 
         current_time = time.time()
         time_between_presses = current_time - start_time
 
         # Save the typing test data to the array
-        typing_data.append((user, key, previous_key, time_between_presses))
+        typing_data.append((user, chr(key), chr(previous_key) if previous_key else None, time_between_presses))
 
         previous_key = key
         start_time = current_time
@@ -49,7 +54,10 @@ def conduct_typing_test(user):
         VALUES (?, ?, ?, ?)
     ''', typing_data)
     conn.commit()
-    print("Typing test completed. Thank you!")
+    stdscr.addstr("Typing test completed. Thank you!\n")
+    stdscr.refresh()
+    curses.echo()  # Re-enable echoing of key presses
+    stdscr.getch()  # Wait for a key press before exiting
 
 # Usage example
 conduct_typing_test("John Doe")
