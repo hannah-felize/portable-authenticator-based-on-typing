@@ -1,6 +1,7 @@
 import sqlite3
 import time
 import curses
+import random
 
 # Connect to the database
 conn = sqlite3.connect('typing_test.db')
@@ -17,6 +18,15 @@ cursor.execute('''
     )
 ''')
 
+# Define multiple variations of typing test text
+typing_texts = [
+    "This is a sample typing test.",
+    "Type the given text accurately.",
+    "Practice makes perfect.",
+    "Efficiency is key.",
+    "Keep calm and type on."
+    ]
+
 def conduct_typing_test(user):
     stdscr = curses.initscr()
     stdscr.clear()
@@ -26,8 +36,9 @@ def conduct_typing_test(user):
         stdscr.addstr("Type the given text and press Enter when you're done.\n")
         stdscr.refresh()
 
-        text = "This is a sample typing test."  # Replace with your own text
+        text = random.choice(typing_texts)  # Replace with your own text
 
+        stdscr.addstr(text + "\n")
         start_time = time.time()
         previous_key = None
 
