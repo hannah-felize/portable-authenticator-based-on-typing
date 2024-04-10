@@ -2,6 +2,7 @@ import sqlite3
 import time
 import curses
 import random
+import json
 
 # Connect to the database
 conn = sqlite3.connect('typing_test.db')
@@ -12,9 +13,7 @@ cursor.execute('''
     CREATE TABLE IF NOT EXISTS typing_data (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user TEXT,
-        key_pressed TEXT,
-        previous_key_pressed TEXT,
-        time_between_presses REAL
+        typing_data TEXT
     )
 ''')
 
@@ -54,16 +53,19 @@ def conduct_typing_test(user):
             time_between_presses = current_time - start_time
 
             # Save the typing test data to the array
-            typing_data.append((user, chr(key), chr(previous_key) if previous_key else None, time_between_presses))
+            typing_data.append({"key_pressed": chr(key), "previous_key_pressed": chr(previous_key) if previous_key else None, "time_between_presses":time_between_presses})
 
             previous_key = key
             start_time = current_time
+            
+            # Convert typing data to JSON format
+            typing_data_json = json.dumps(typing_data)
 
         # Insert the typing test data into the database
-        cursor.executemany('''
-            INSERT INTO typing_data (user, key_pressed, previous_key_pressed, time_between_presses)
-            VALUES (?, ?, ?, ?)
-        ''', typing_data)
+        cursor.execute('''
+            INSERT INTO typing_data (user, typing_data)
+            VALUES (?, ?)
+        ''', (user, typing_data_json))
         conn.commit()
         stdscr.addstr("Typing test completed. Thank you!\n")
         stdscr.refresh()
