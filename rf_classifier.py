@@ -1,5 +1,6 @@
 import sqlite3
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
@@ -25,7 +26,6 @@ for typing_test in typing_data_df:
         if count_key_presses > max_key_presses:
             max_key_presses = count_key_presses
     count_key_presses = 0
-print(max_key_presses)
 
 # Create a new sqlite3 table to store the preprocessed typing data
 cursor = conn.cursor()
@@ -64,30 +64,48 @@ for index, row in df.iterrows():
     ''', values)
     conn.commit()
 
-# # Features are all columns except 'user'
-# X = df.drop('user', axis=1)
+# Load the data from the database
+query = "SELECT * FROM preprocessed_typing_data"
+df = pd.read_sql_query(query, conn)
 
-# # Target is the 'user' column
-# y = df['user']
+# Create a LabelEncoder
+le = LabelEncoder()
 
-# # Split data into training and testing sets
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Fit the LabelEncoder on the 'key_pressed' and 'previous_key_pressed' columns
+for i in range(1, max_key_presses+1):
+    df[f'key_pressed_{i}'] = le.fit_transform(df[f'key_pressed_{i}'])
+    df[f'previous_key_pressed_{i}'] = le.fit_transform(df[f'previous_key_pressed_{i}'])
 
-# # Choose Model
-# model = RandomForestClassifier()
+# Fill NaN values in the feature columns with 0 or the mean of the column
+feature_columns = [col for col in df.columns if col != 'user']
+df[feature_columns] = df[feature_columns].fillna(0)
+# Or fill with the mean of the column
+df[feature_columns] = df[feature_columns].fillna(df[feature_columns].mean())
 
-# # Train Model
-# model.fit(X_train, y_train)
+# Features are all columns except 'user'
+X = df.drop('user', axis=1)
 
-# # Evaluate Model
-# y_pred = model.predict(X_test)
-# accuracy = accuracy_score(y_test, y_pred)
-# print("Accuracy:", accuracy)
+# Target is the 'user' column
+y = df['user']
 
-# # Make Predictions
-# # You can now use the trained model to make predictions on new typing test data
-# # For example, you can use X_test or new data
-# predictions = model.predict(X_test)
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Choose Model
+model = RandomForestClassifier()
+
+# Train Model
+model.fit(X_train, y_train)
+
+# Evaluate Model
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
+
+# Make Predictions
+# You can now use the trained model to make predictions on new typing test data
+# For example, you can use X_test or new data
+predictions = model.predict(X_test)
 
 # Close the database connection
 conn.close()
