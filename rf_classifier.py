@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 import json
+import pickle
 
 # Connect to the database
 conn = sqlite3.connect('typing_test.db')
@@ -76,11 +77,9 @@ for i in range(1, max_key_presses+1):
     df[f'key_pressed_{i}'] = le.fit_transform(df[f'key_pressed_{i}'])
     df[f'previous_key_pressed_{i}'] = le.fit_transform(df[f'previous_key_pressed_{i}'])
 
-# Fill NaN values in the feature columns with 0 or the mean of the column
+# Fill NaN values in the feature columns with 0
 feature_columns = [col for col in df.columns if col != 'user']
 df[feature_columns] = df[feature_columns].fillna(0)
-# Or fill with the mean of the column
-df[feature_columns] = df[feature_columns].fillna(df[feature_columns].mean())
 
 # Features are all columns except 'user'
 X = df.drop('user', axis=1)
@@ -96,6 +95,10 @@ model = RandomForestClassifier()
 
 # Train Model
 model.fit(X_train, y_train)
+
+# Save the trained model to a file
+with open('trained_model.pkl', 'wb') as file:
+    pickle.dump(model, file)
 
 # Evaluate Model
 y_pred = model.predict(X_test)
