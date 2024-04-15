@@ -35,6 +35,7 @@ def conduct_typing_test():
             user = user.decode('utf-8')
 
         stdscr.addstr("Type the given text and press Enter when you're done.\n")
+        stdscr.addstr("=====================================================\n")
         stdscr.refresh()
 
         text = random.choice(typing_texts)  # Replace with your own text
@@ -44,6 +45,7 @@ def conduct_typing_test():
         previous_key = None
 
         typing_data = []  # Array to store typing test data
+        characters_typed = 0  # Counter for characters typed
 
         while True:
             key = stdscr.getch()
@@ -54,11 +56,18 @@ def conduct_typing_test():
             current_time = time.time()
             time_between_presses = current_time - start_time
 
+            # Check if the number of characters typed exceeds the limit
+            if characters_typed >= 75:
+                stdscr.addstr("You have reached the maximum character limit.\n")
+                stdscr.refresh()
+                break
+
             # Save the typing test data to the array
             typing_data.append({"key_pressed": chr(key), "previous_key_pressed": chr(previous_key) if previous_key else None, "time_between_presses": time_between_presses})
 
             previous_key = key
             start_time = current_time
+            characters_typed += 1
 
         # Return the typing data and user name
         return user, typing_data
@@ -68,7 +77,7 @@ def conduct_typing_test():
 
 def main():
     # Connect to the database
-    conn = sqlite3.connect('typing_test.db')
+    conn = sqlite3.connect('typing_tests.db')
     cursor = conn.cursor()
 
     # Create a table to store typing test data

@@ -94,7 +94,7 @@ def make_predictions(model, X):
 
 def main():
     # Connect to the database
-    conn = sqlite3.connect('typing_test.db')
+    conn = sqlite3.connect('typing_tests.db')
 
     # Read data from the database into a DataFrame
     query = "SELECT * FROM typing_data"
