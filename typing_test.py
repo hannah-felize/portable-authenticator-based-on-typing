@@ -24,7 +24,7 @@ typing_texts = [
     "Practice makes perfect.",
     "Efficiency is key.",
     "Keep calm and type on."
-    ]
+]
 
 def conduct_typing_test(user):
     stdscr = curses.initscr()
@@ -53,28 +53,29 @@ def conduct_typing_test(user):
             time_between_presses = current_time - start_time
 
             # Save the typing test data to the array
-            typing_data.append({"key_pressed": chr(key), "previous_key_pressed": chr(previous_key) if previous_key else None, "time_between_presses":time_between_presses})
+            typing_data.append({"key_pressed": chr(key), "previous_key_pressed": chr(previous_key) if previous_key else None, "time_between_presses": time_between_presses})
 
             previous_key = key
             start_time = current_time
-            
-            # Convert typing data to JSON format
-            typing_data_json = json.dumps(typing_data)
 
-        # Insert the typing test data into the database
-        cursor.execute('''
-            INSERT INTO typing_data (user, typing_data)
-            VALUES (?, ?)
-        ''', (user, typing_data_json))
-        conn.commit()
-        stdscr.addstr("Typing test completed. Thank you!\n")
-        stdscr.refresh()
-        stdscr.getch()  # Wait for a key press before exiting
+        # Return the typing data
+        return typing_data
+
     finally:
         curses.endwin()
 
 # Usage example
-conduct_typing_test("John Doe")
+typing_data = conduct_typing_test("John Doe")
+
+# Convert typing data to JSON format
+typing_data_json = json.dumps(typing_data)
+
+# Insert the typing test data into the database
+cursor.execute('''
+    INSERT INTO typing_data (user, typing_data)
+    VALUES (?, ?)
+''', ("John Doe", typing_data_json))
+conn.commit()
 
 # Close the database connection
 conn.close()
