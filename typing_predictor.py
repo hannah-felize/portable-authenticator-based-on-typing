@@ -23,7 +23,7 @@ def main():
     
     # Check if the input username matches the predicted username
     if user == prediction[0]:
-        print("Authentication successful!")
+        print("Authentication successful! Welcome, " + user + ".")
     else:
         print("Authentication failed!")
 
