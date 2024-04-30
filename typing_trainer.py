@@ -38,14 +38,14 @@ def conduct_typing_test():
         stdscr.addstr("=====================================================\n")
         stdscr.refresh()
 
-        text = random.choice(typing_texts)  # Replace with your own text
+        text = random.choice(typing_texts)
 
         stdscr.addstr(text + "\n")
         start_time = time.time()
         previous_key = None
 
-        typing_data = []  # Array to store typing test data
-        characters_typed = 0  # Counter for characters typed
+        typing_data = []
+        characters_typed = 0
 
         while True:
             key = stdscr.getch()

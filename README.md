@@ -18,12 +18,22 @@ This Python program is designed to run on a Raspberry Pi and provides a typing t
    $ pip install -r requirements.txt
    ```
 
-2. Run the program by executing the following command:
+2. Run the typing trainer program by executing the following command:
 
    ```bash
-   $ python typing_authenticator.py
+   $ python typing_trainer.py
    ```
 
-3. Follow the on-screen instructions to perform the typing test.
+3. Run the random forest classifier program by executing the following command:
 
-4. The program will output a confidence level identifying which user it predicts to have done the typing.
+   ```bash
+   $ python rf_classifier.py
+   ```
+
+4. Run the typing predictor program by executing the following command:
+
+   ```bash
+   $ python typing_predictor.py
+   ```
+
+5. Follow the on-screen instructions to perform the typing test.
